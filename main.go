@@ -130,6 +130,13 @@ func main() {
 		expenses = append(expenses, transaction)
 	}
 
+	err := expense.SaveExpense(expenses)
+	if err != nil {
+		fmt.Println("failed to save expenses:", err)
+		return
+	}
+	fmt.Println("Expenses saved successfully!")
+
 	fmt.Println("================================")
 	fmt.Println("       EXPENSE DETAIL")
 	fmt.Println("================================")

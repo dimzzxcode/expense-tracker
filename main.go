@@ -263,6 +263,28 @@ func sortExpenses() {
     }
 }
 
+func showSummary() {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    if len(expenses) == 0 {
+        fmt.Println("No expenses found.")
+        return
+    }
+
+    summary := expense.CalculateSummary(expenses)
+
+    fmt.Println("\n========== EXPENSE SUMMARY ==========")
+    fmt.Printf("Total Expense   : Rp%.0f\n", summary.Total)
+    fmt.Printf("Average Expense : Rp%.0f\n", summary.Average)
+    fmt.Printf("Highest Expense : Rp%.0f\n", summary.Highest)
+    fmt.Printf("Lowest Expense  : Rp%.0f\n", summary.Lowest)
+    fmt.Println("=====================================")
+}
+
 func main() {
     scanner := bufio.NewScanner(os.Stdin)
 
@@ -302,6 +324,9 @@ func main() {
 
         case "2":
             listExpenses()
+
+		case "3":
+    		showSummary()
 
         case "6":
             updateExpense(scanner)

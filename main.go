@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"expense-tracker/internal/expense"
+	"flag"
 	"fmt"
 	"os"
 	"slices"
@@ -302,6 +303,25 @@ func exportExpenses() {
 }
 
 func main() {
+	exportFlag := flag.Bool("export", false, "Export expenses to CSV")
+	flag.Parse()
+
+	if *exportFlag {
+		expenses, err := expense.LoadExpenses()
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		if err := expense.ExportCSV(expenses); err != nil {
+			fmt.Println("Export failed:", err)
+			return
+		}
+
+		fmt.Println("Expenses exported to expenses.csv")
+		return
+	}
+
     scanner := bufio.NewScanner(os.Stdin)
 
     showHeader()

@@ -27,6 +27,9 @@ func showMenu() {
 	fmt.Println("5. Help")
 	fmt.Println("6. Update Expense")
 	fmt.Println("7. Delete Expense")
+	fmt.Println("8. Search Expense")
+	fmt.Println("9. Filter Expense")
+	fmt.Println("10. Sort Expense")
 	fmt.Println("================================")
 }
 
@@ -193,6 +196,73 @@ func deleteExpense(scanner *bufio.Scanner) {
     fmt.Println("Expense deleted successfully!")
 }
 
+func searchExpense(scanner *bufio.Scanner) {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    fmt.Print("Enter keyword: ")
+    if !scanner.Scan() {
+        return
+    }
+
+    keyword := strings.TrimSpace(scanner.Text())
+    results := expense.SearchExpenses(expenses, keyword)
+
+    if len(results) == 0 {
+        fmt.Println("No matching expenses found.")
+        return
+    }
+
+    for _, tx := range results {
+        fmt.Printf("%d | %s | Rp%.0f | %s\n",
+            tx.ID, tx.Description, tx.Amount, tx.Category)
+    }
+}
+
+func filterExpense(scanner *bufio.Scanner) {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    fmt.Print("Enter category: ")
+    if !scanner.Scan() {
+        return
+    }
+
+    category := strings.TrimSpace(scanner.Text())
+    results := expense.FilterExpenses(expenses, category)
+
+    if len(results) == 0 {
+        fmt.Println("No expenses found in this category.")
+        return
+    }
+
+    for _, tx := range results {
+        fmt.Printf("%d | %s | Rp%.0f | %s\n",
+            tx.ID, tx.Description, tx.Amount, tx.Category)
+    }
+}
+
+func sortExpenses() {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    expense.SortExpensesByAmount(expenses)
+
+    for _, tx := range expenses {
+        fmt.Printf("%d | %s | Rp%.0f | %s\n",
+            tx.ID, tx.Description, tx.Amount, tx.Category)
+    }
+}
+
 func main() {
     scanner := bufio.NewScanner(os.Stdin)
 
@@ -238,6 +308,15 @@ func main() {
 
         case "7":
             deleteExpense(scanner)
+		
+		case "8":
+			searchExpense(scanner)
+		
+		case "9":
+			filterExpense(scanner)
+		
+		case "10":
+			sortExpenses()
 
         case "4":
             fmt.Println("Thank you for using Expense Tracker!")

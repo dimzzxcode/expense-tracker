@@ -5,6 +5,7 @@ import (
 	"expense-tracker/internal/expense"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -96,6 +97,34 @@ func addExpense(scanner *bufio.Scanner, id int) expense.Expense {
 	return transaction
 }
 
+func listExpenses() {
+	expenses, err := expense.LoadExpenses()
+	if err != nil {
+		fmt.Println("failed to load expenses:", err)
+		return
+	}
+
+	if len(expenses) == 0 {
+		fmt.Println("no expenses found.")
+		return
+	}
+
+	slices.SortFunc(expenses, func(a, b expense.Expense) int {
+		return a.ID - b.ID
+	})
+
+	fmt.Println("\n========== EXPENSE LIST ==========")
+
+    for _, tx := range expenses {
+        fmt.Printf("ID          : %d\n", tx.ID)
+        fmt.Printf("Description : %s\n", tx.Description)
+        fmt.Printf("Amount      : Rp%.0f\n", tx.Amount)
+        fmt.Printf("Category    : %s\n", tx.Category)
+        fmt.Printf("Date        : %s\n", tx.Date.Format("2006-01-02"))
+        fmt.Println("----------------------------------")
+    }
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
@@ -137,18 +166,7 @@ func main() {
 	}
 	fmt.Println("Expenses saved successfully!")
 
-	fmt.Println("================================")
-	fmt.Println("       EXPENSE DETAIL")
-	fmt.Println("================================")
-
-	for _, tx := range expenses {
-		fmt.Printf("ID          : %d\n", tx.ID)
-		fmt.Printf("Description : %s\n", tx.Description)
-		fmt.Printf("Amount      : Rp%.0f\n", tx.Amount)
-		fmt.Printf("Category    : %s\n", tx.Category)
-		fmt.Printf("Date        : %s\n", tx.Date.Format("2006-01-02"))
-		fmt.Println("--------------------------------")
-	}
+	listExpenses()
 
 	showFooter()
 }

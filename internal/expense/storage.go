@@ -18,3 +18,19 @@ func SaveExpense(expense []Expense) error {
 
 	return nil
 }
+
+func LoadExpenses() ([]Expense, error) {
+	data, err := os.ReadFile("expenses.json")
+	if err != nil {
+		return nil, err
+	}
+
+	var expenses []Expense
+
+	err = json.Unmarshal(data, &expenses)
+	if err != nil {
+		return nil, err
+	}
+
+	return expenses, nil
+}

@@ -30,6 +30,7 @@ func showMenu() {
 	fmt.Println("8. Search Expense")
 	fmt.Println("9. Filter Expense")
 	fmt.Println("10. Sort Expense")
+	fmt.Println("11. Export CSV")
 	fmt.Println("================================")
 }
 
@@ -285,6 +286,21 @@ func showSummary() {
     fmt.Println("=====================================")
 }
 
+func exportExpenses() {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    if err := expense.ExportCSV(expenses); err != nil {
+        fmt.Println("Failed to export CSV:", err)
+        return
+    }
+
+    fmt.Println("Expenses exported successfully to expenses.csv!")
+}
+
 func main() {
     scanner := bufio.NewScanner(os.Stdin)
 
@@ -342,6 +358,9 @@ func main() {
 		
 		case "10":
 			sortExpenses()
+
+		case "11":
+    		exportExpenses()
 
         case "4":
             fmt.Println("Thank you for using Expense Tracker!")

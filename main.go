@@ -25,6 +25,8 @@ func showMenu() {
 	fmt.Println("3. Summary")
 	fmt.Println("4. Exit")
 	fmt.Println("5. Help")
+	fmt.Println("6. Update Expense")
+	fmt.Println("7. Delete Expense")
 	fmt.Println("================================")
 }
 
@@ -125,48 +127,125 @@ func listExpenses() {
     }
 }
 
+func updateExpense(scanner *bufio.Scanner) {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    fmt.Print("Enter expense ID to update: ")
+    if !scanner.Scan() {
+        return
+    }
+
+    id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+    if err != nil {
+        fmt.Println("Invalid ID.")
+        return
+    }
+
+    updated := addExpense(scanner, id)
+
+    expenses, err = expense.UpdateExpense(expenses, id, updated)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    if err := expense.SaveExpense(expenses); err != nil {
+        fmt.Println("Failed to save expenses:", err)
+        return
+    }
+
+    fmt.Println("Expense updated successfully!")
+}
+
+func deleteExpense(scanner *bufio.Scanner) {
+    expenses, err := expense.LoadExpenses()
+    if err != nil {
+        fmt.Println("Failed to load expenses:", err)
+        return
+    }
+
+    fmt.Print("Enter expense ID to delete: ")
+    if !scanner.Scan() {
+        return
+    }
+
+    id, err := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+    if err != nil {
+        fmt.Println("Invalid ID.")
+        return
+    }
+
+    expenses, err = expense.DeleteExpense(expenses, id)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+
+    if err := expense.SaveExpense(expenses); err != nil {
+        fmt.Println("Failed to save expenses:", err)
+        return
+    }
+
+    fmt.Println("Expense deleted successfully!")
+}
+
 func main() {
-	scanner := bufio.NewScanner(os.Stdin)
+    scanner := bufio.NewScanner(os.Stdin)
 
-	showHeader()
-	showMenu()
+    showHeader()
 
-	var totalToAdd int
-	for {
-		fmt.Print("\nHow many expenses would you like to input? : ")
-		if !scanner.Scan() {
-			return
-		}
+    for {
+        showMenu()
 
-		input := strings.TrimSpace(scanner.Text())
-		n, err := strconv.Atoi(input)
-		if err != nil || n <= 0 {
-			fmt.Println("Invalid input. Enter a valid positive number.")
-			continue
-		}
-		totalToAdd = n
-		break
-	}
+        fmt.Print("Choose menu: ")
+        if !scanner.Scan() {
+            return
+        }
 
-	// slice menampung banyak expense
-	var expenses []expense.Expense
+        choice := strings.TrimSpace(scanner.Text())
 
-	for i := 1; i <= totalToAdd; i++ {
-		fmt.Printf("\n=== Add New Expense (%d/%d) ===\n", i, totalToAdd)
-		// kirim i sebagai ID transaksi
-		transaction := addExpense(scanner, i)
-		// masukan kedalam slice
-		expenses = append(expenses, transaction)
-	}
+        switch choice {
+        case "1":
+            expenses, err := expense.LoadExpenses()
+            if err != nil {
+                expenses = []expense.Expense{}
+            }
 
-	err := expense.SaveExpense(expenses)
-	if err != nil {
-		fmt.Println("failed to save expenses:", err)
-		return
-	}
-	fmt.Println("Expenses saved successfully!")
+            id := 1
+            if len(expenses) > 0 {
+                id = expenses[len(expenses)-1].ID + 1
+            }
 
-	listExpenses()
+            transaction := addExpense(scanner, id)
+            expenses = append(expenses, transaction)
 
-	showFooter()
+            if err := expense.SaveExpense(expenses); err != nil {
+                fmt.Println("Failed to save:", err)
+                continue
+            }
+
+            fmt.Println("Expense added successfully!")
+
+        case "2":
+            listExpenses()
+
+        case "6":
+            updateExpense(scanner)
+
+        case "7":
+            deleteExpense(scanner)
+
+        case "4":
+            fmt.Println("Thank you for using Expense Tracker!")
+            showFooter()
+            return
+
+        default:
+            fmt.Println("Invalid menu choice.")
+        }
+    }
 }

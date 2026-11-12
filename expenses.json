@@ -1,9 +1,16 @@
 [
  {
-  "ID": 1,
-  "Description": "cuangki",
-  "Amount": 10000,
+  "ID": 2,
+  "Description": "mi ayam",
+  "Amount": 9000,
+  "Category": "mi",
+  "Date": "2026-11-12T15:26:03.9399041+07:00"
+ },
+ {
+  "ID": 3,
+  "Description": "bakso",
+  "Amount": 12000,
   "Category": "makanan",
-  "Date": "2026-11-12T15:14:26.0657074+07:00"
+  "Date": "2026-11-12T15:27:15.8042335+07:00"
  }
 ]
